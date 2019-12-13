@@ -1,4 +1,4 @@
-From 4dd5a58a0f2d04c25727c94f4e51273ac45e87d0 Mon Sep 17 00:00:00 2001
+From ae46915a94a2d4e09b43bd17700c0c39a583928b Mon Sep 17 00:00:00 2001
 From: Sultanxda <sultanxda@gmail.com>
 Date: Mon, 26 Sep 2016 21:16:38 -0700
 Subject: [PATCH] LockClock: Remove wakelock
@@ -9,15 +9,15 @@ just remove it because having a wakelock for this does not make much sense.
 
 Change-Id: I0e9d1560988fdb90a61d7b9a09f72bffa50cf40c
 ---
- AndroidManifest.xml                                           |  1 -
- .../cyanogenmod/lockclock/weather/WeatherUpdateService.java   | 11 -----------
- 2 files changed, 12 deletions(-)
+ AndroidManifest.xml                                 |  1 -
+ .../lockclock/weather/WeatherUpdateService.java     | 13 -------------
+ 2 files changed, 14 deletions(-)
 
 diff --git a/AndroidManifest.xml b/AndroidManifest.xml
-index d4255e8..6501fa0 100644
+index e2764b4..3f9f4eb 100644
 --- a/AndroidManifest.xml
 +++ b/AndroidManifest.xml
-@@ -32,7 +32,6 @@
+@@ -33,7 +33,6 @@
  
      <!-- General -->
      <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -26,7 +26,7 @@ index d4255e8..6501fa0 100644
      <uses-permission android:name="cyanogenmod.permission.ACCESS_WEATHER_MANAGER" />
      <uses-permission android:name="cyanogenmod.permission.READ_WEATHER" />
 diff --git a/src/com/cyanogenmod/lockclock/weather/WeatherUpdateService.java b/src/com/cyanogenmod/lockclock/weather/WeatherUpdateService.java
-index 1fd6f70..36d0b0c 100644
+index 6394c6b..1600d9e 100644
 --- a/src/com/cyanogenmod/lockclock/weather/WeatherUpdateService.java
 +++ b/src/com/cyanogenmod/lockclock/weather/WeatherUpdateService.java
 @@ -32,8 +32,6 @@ import android.os.HandlerThread;
@@ -38,7 +38,7 @@ index 1fd6f70..36d0b0c 100644
  import android.os.SystemClock;
  import android.text.TextUtils;
  import android.util.Log;
-@@ -199,7 +197,6 @@ public class WeatherUpdateService extends Service {
+@@ -200,7 +198,6 @@ public class WeatherUpdateService extends Service {
  
          private Handler mHandler;
          private boolean mIsProcessingWeatherUpdate = false;
@@ -46,7 +46,7 @@ index 1fd6f70..36d0b0c 100644
          private PendingIntent mTimeoutPendingIntent;
          private int mRequestId;
          private final CMWeatherManager mWeatherManager;
-@@ -272,12 +269,6 @@ public class WeatherUpdateService extends Service {
+@@ -273,12 +270,6 @@ public class WeatherUpdateService extends Service {
              }
  
              mIsProcessingWeatherUpdate = true;
@@ -59,15 +59,17 @@ index 1fd6f70..36d0b0c 100644
  
              WeatherLocation customWeatherLocation = null;
              if (Preferences.useCustomWeatherLocation(mContext)) {
-@@ -404,8 +395,6 @@ public class WeatherUpdateService extends Service {
+@@ -404,10 +395,6 @@ public class WeatherUpdateService extends Service {
              finishedIntent.putExtra(EXTRA_UPDATE_CANCELLED, updateCancelled);
              mContext.sendBroadcast(finishedIntent);
  
--            if (D) Log.d(TAG, "RELEASING WAKELOCK");
--            mWakeLock.release();
+-            if (mWakeLock != null && mWakeLock.isHeld()) {
+-                if (D) Log.d(TAG, "RELEASING WAKELOCK");
+-                mWakeLock.release();
+-            }
              mIsProcessingWeatherUpdate = false;
              mContext.stopService(new Intent(mContext, WeatherUpdateService.class));
          }
 -- 
-2.7.4
+2.24.0
 
